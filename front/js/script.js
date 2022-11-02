@@ -1,4 +1,5 @@
 // Récupération des données de l'Api
+
 fetch(`http://localhost:3000/api/products`)
   .then(function(response) {
     if(response.ok) {
@@ -13,7 +14,7 @@ fetch(`http://localhost:3000/api/products`)
     
   })
 
-// Création de la classe "meubles"
+// Création de la classe "Meubles"
 class Meubles {
   constructor(couleur, id, nom, prix, imageUrl, description, altTexte){
     this.couleur = couleur;
@@ -39,9 +40,24 @@ function creationObjets(articles) {
   }
 
   console.log(tableauArticles);
-
+  newElt();
 }
 
-// Fonction permettant d'injecter les articles dans le code HTML
+// Fonction d'affichage des éléments dans le HTML
+function newElt() {
+  
+  const items = document.getElementById('items');
 
+  for(let article of tableauArticles) {
 
+    items.insertAdjacentHTML('afterbegin', `
+    <a href="./product.html?id=${article._id}">
+    <article>
+    <img src="${article.imageUrl}" alt="${article.altTexte}">
+    <h3 class="productName">${article.nom}</h3>
+    <p class="productDescription">${article.description}</p>
+    </article>
+    </a>
+    `);
+  }
+}
