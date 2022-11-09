@@ -1,4 +1,4 @@
-// Récupération des données de l'Api
+/* Récupération des données de l'Api */
 
 fetch(`http://localhost:3000/api/products`)
   .then(function(response) {
@@ -11,10 +11,11 @@ fetch(`http://localhost:3000/api/products`)
     creationObjets(articles);
   })
   .catch(function(error) {
-    
+    console.log(error);
   })
 
-// Création de la classe "Meubles"
+/** Création de la classe "Meubles" (Facultatif) **/
+
 class Meubles {
   constructor(couleur, id, nom, prix, imageUrl, description, altTexte){
     this.couleur = couleur;
@@ -27,10 +28,12 @@ class Meubles {
   }
 }
 
-// Création d'un tableau vide
+/*** Création d'un tableau vide (Facultatif) ***/
+
 let tableauArticles = [];
 
-// Fonction permettant d'ajouter les articles dans le tableau vide
+/**** Fonction permettant d'ajouter les articles dans le tableau vide à l'aide d'une boucle for... of (Facultatif) ****/
+
 function creationObjets(articles) {
 
   for(let article of articles) {
@@ -43,15 +46,29 @@ function creationObjets(articles) {
   newElt();
 }
 
-// Fonction d'affichage des éléments dans le HTML
+/***** Fonction d'affichage des éléments dans le HTML *****/
+
 function newElt() {
   
-  const items = document.getElementById('items');
+  const items = document.getElementById('items'); //Permet d'accéder à l'élément HTML dont l'id est "items"
+
+  const urlIndex = encodeURI(window.location.href); //Encodage de l'url
+  const urlProduct = urlIndex.replace('html', 'html/product.html'); //dynamique
+  const urlWithoutSlash = urlProduct.substring(0, urlProduct.length -1);//Pour enlever le '/'
+
+  console.log('urlProduct =' + urlWithoutSlash);
+
+  const newUrl = new URL(urlWithoutSlash); //pour pouvoir utiliser les méthodes (objet url)
+
+  console.log(newUrl);
 
   for(let article of tableauArticles) {
 
-    items.insertAdjacentHTML('afterbegin', `
-    <a href="./product.html?id=${article._id}">
+    newUrl.searchParams.set('id', article.id);
+
+  //Analyse et ajoute les éléments comme du HTML tout en évitant la sérialisation (traduire un objet ou autre dans un format approprié)  
+    items.insertAdjacentHTML('afterbegin', ` 
+    <a href="${newUrl.href}">
     <article>
     <img src="${article.imageUrl}" alt="${article.altTexte}">
     <h3 class="productName">${article.nom}</h3>
@@ -59,5 +76,14 @@ function newElt() {
     </article>
     </a>
     `);
+
   }
 }
+
+
+
+
+
+
+
+
