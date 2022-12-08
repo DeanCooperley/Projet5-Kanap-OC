@@ -32,7 +32,7 @@ class Meubles {
 
 let tableauArticles = [];
 
-/**** Fonction permettant d'ajouter les articles dans le tableau vide à l'aide d'une boucle for... of (Facultatif) ****/
+/**** Fonction permettant d'ajouter les articles dans le tableau vide à l'aide d'une boucle for... of ****/
 
 function creationObjets(articles) {
 
@@ -53,12 +53,12 @@ function newElt() {
   const items = document.getElementById('items'); //Permet d'accéder à l'élément HTML dont l'id est "items"
 
   const urlIndex = encodeURI(window.location.href); //Encodage de l'url
-  const urlProduct = urlIndex.replace('html', 'html/product.html'); //dynamique
-  const urlWithoutSlash = urlProduct.substring(0, urlProduct.length -1);//Pour enlever le '/'
+  const urlProduct = urlIndex.replace('html', 'html/product.html');
+  const urlWithoutSlash = urlProduct.substring(0, urlProduct.length -1);//Permet d'enlever le slash dans l'url
 
   console.log('urlProduct =' + urlWithoutSlash);
 
-  const newUrl = new URL(urlWithoutSlash); //pour pouvoir utiliser les méthodes (objet url)
+  const newUrl = new URL(urlWithoutSlash); //Permet d'utiliser les méthodes (objet url)
 
   console.log(newUrl);
 
