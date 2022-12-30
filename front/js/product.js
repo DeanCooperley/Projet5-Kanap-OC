@@ -69,7 +69,8 @@ function storeData() {
     return;
   }
 
-  if (targetColor && targetQty) {
+  // Vérifie que la quantité et la couleur sont sélectionnées et que la valeur de la couleur n'est pas vide avant de créer l'objet "item"
+  if (targetColor && targetQty && targetQty.value > 0 && targetColor.value !== "") {
     let item = {
       id: idUrl,
       color: targetColor.value,
@@ -77,6 +78,8 @@ function storeData() {
     }
 
     addToCart(item);
+} else {
+  alert("Vous devez indiquer une couleur.");
 }
 }
 
@@ -95,20 +98,31 @@ function getCart() {
   }
 }
 
-//Ajouter un article avec la quantité
+// Ajoute un article au panier
 function addToCart(item) {
   let cart = getCart();
-  const existingItem = cart.find((i) => i.id === item.id && i.color === item.color);
-  if (item.qty >= 1 && item.qty <= 100) {
-    if (existingItem != undefined) {
-      existingItem.qty = item.qty;
-    } else {
-      cart.push(item);
+  let itemExists = false;
+
+  // Convertit la valeur de item.qty en entier
+  item.qty = parseInt(item.qty);
+
+  // Vérifie si l'article existe déjà dans le panier
+  for (let i = 0; i < cart.length; i++) {
+    if (cart[i].id === item.id && cart[i].color === item.color) {
+      // Incrémente la quantité de l'article existant
+      cart[i].qty += item.qty;
+      itemExists = true;
+      break;
     }
-    saveInLocalStorage(cart);
-  } else {
-    alert("Sélectionner une couleur et une quantité comprise entre 1 et 100.");
   }
+
+  // Ajoute l'article au panier s'il n'existe pas déjà
+  if (!itemExists) {
+    cart.push(item);
+  }
+
+  // Enregistre le panier dans le local storage
+  saveInLocalStorage(cart);
 }
 
 //Modifier la quantité des articles dans le panier
@@ -130,5 +144,3 @@ function removeFromCart(item) {
   cart = cart.filter(i => i.id !== item.id || i.color !== item.color);
   saveInLocalStorage(cart);
 }
-
-
