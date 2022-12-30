@@ -54,7 +54,7 @@ function display(articleUnique) {
   }
 }
 
-//**** Sélection du bouton d'ajout au panier et gestion du local storage ****/
+//**** Sélection du bouton d'ajout au panier, création du local storage, du panier et enregistrement des articles ****/
 const btnCart = document.querySelector("#addToCart");
 btnCart.addEventListener("click", storeData);
 
@@ -80,12 +80,12 @@ function storeData() {
 }
 }
 
-// Sauvegarder le panier dans le local storage
+//Sauvegarder le panier dans le local storage
 function saveInLocalStorage(cart) { 
   localStorage.setItem("cart", JSON.stringify(cart));
 }
 
-// Récupérer les articles du local storage
+//Récupérer les articles du local storage
 function getCart() {
   let cart = localStorage.getItem("cart");
   if (cart == null) {
@@ -95,7 +95,7 @@ function getCart() {
   }
 }
 
-// Ajouter un article avec la quantité
+//Ajouter un article avec la quantité
 function addToCart(item) {
   let cart = getCart();
   const existingItem = cart.find((i) => i.id === item.id && i.color === item.color);
@@ -111,14 +111,7 @@ function addToCart(item) {
   }
 }
 
-// Enlever un article
-function removeFromCart(item) {
-  let cart = getCart();
-  cart = cart.filter(i => i.id !== item.id || i.color !== item.color);
-  saveInLocalStorage(cart);
-}
-
-// Modifier la quantité des articles dans le panier
+//Modifier la quantité des articles dans le panier
 function changeQty(item, newQty) {
   let cart = getCart();
   const existingItem = cart.find((i) => i.id === item.id && i.color === item.color);
@@ -130,3 +123,12 @@ function changeQty(item, newQty) {
   }
   saveInLocalStorage(cart);
 }
+
+//Enlever un article
+function removeFromCart(item) {
+  let cart = getCart();
+  cart = cart.filter(i => i.id !== item.id || i.color !== item.color);
+  saveInLocalStorage(cart);
+}
+
+
