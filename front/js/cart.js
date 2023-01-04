@@ -56,14 +56,42 @@ async function displayCart() {
       document.querySelector('#cart__items').appendChild(itemElement);
     }
 
-    // création de l'élément HTML pour afficher le total
-let priceElement = document.createElement('div');
-priceElement.classList.add('cart__price');
-priceElement.innerHTML = `
-  <p>Total (<span id="totalQuantity">${numItems}</span> articles) : <span id="totalPrice">${total} €</span></p>
-`;
+    // mise à jour de l'élément HTML pour afficher le total
+    document.getElementById('totalQuantity').innerHTML = numItems;
+    document.getElementById('totalPrice').innerHTML = total;
+  }
+}
 
-// insertion de l'élément HTML dans la page
-document.querySelector('#cart__items').appendChild(priceElement);
-}
-}
+// ajout d'un EventListener de type 'change' sur tous les éléments HTML de classe 'itemQuantity'
+document.querySelectorAll('.itemQuantity').forEach(function(input) {
+  input.addEventListener('change', function() {
+    // récupération de la quantité
+    let qty = input.value;
+
+    // récupération de l'article parent
+    let item = input.parentElement.parentElement.parentElement.parentElement;
+
+    // récupération du prix de l'article
+    let price = item.querySelector('.cart__item__content__description > p:last-child').textContent;
+
+    // mise à jour du prix total de l'article
+    item.querySelector('.cart__item__content__description > p:last-child').textContent = qty * price + " €";
+
+    // récupération des éléments HTML correspondant au nombre d'articles et au prix total
+    let totalQuantityElement = document.getElementById('totalQuantity');
+    let totalPriceElement = document.getElementById('totalPrice');
+
+    // récupération des valeurs actuelles de ces éléments
+    let totalQuantity = parseInt(totalQuantityElement.textContent);
+    let totalPrice = parseInt(totalPriceElement.textContent);
+
+    // mise à jour de ces valeurs
+    totalQuantity += qty - oldQty;
+    totalPrice += qty * price - oldQty * oldPrice;
+
+    // mise à jour des éléments HTML
+    totalQuantityElement.innerHTML = totalQuantity;
+    totalPriceElement.innerHTML = totalPrice + " €";
+  });
+});
+
