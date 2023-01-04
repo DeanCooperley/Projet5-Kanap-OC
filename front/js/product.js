@@ -12,10 +12,10 @@ fetch("http://localhost:3000/api/products/" + idUrl)
     }
   })
   .then(function (articleUnique) {
-    if (articleUnique) { // Si l'article contient des données
+    if (articleUnique) { //Si l'article contient des données
       console.log(articleUnique);
       display(articleUnique);
-    } else { // Si l'article ne contient pas de données
+    } else { //Si l'article ne contient pas de données
       console.error("Cet article n'est pas disponible.");
     }
   })
@@ -86,16 +86,7 @@ function storeData() {
 //Sauvegarder le panier dans le local storage
 function saveInLocalStorage(cart) { 
   localStorage.setItem("cart", JSON.stringify(cart));
-}
-
-//Récupérer les articles du local storage
-function getCart() {
-  let cart = localStorage.getItem("cart");
-  if (cart == null) {
-    return [];
-  } else {
-    return JSON.parse(cart);
-  }
+  window.location.href = "cart.html"
 }
 
 // Ajoute un article au panier
@@ -116,31 +107,23 @@ function addToCart(item) {
     }
   }
 
-  // Ajoute l'article au panier s'il n'existe pas déjà
+  //Ajoute l'article au panier s'il n'existe pas déjà
   if (!itemExists) {
     cart.push(item);
   }
 
-  // Enregistre le panier dans le local storage
   saveInLocalStorage(cart);
 }
 
-//Modifier la quantité des articles dans le panier
-function changeQty(item, newQty) {
-  let cart = getCart();
-  const existingItem = cart.find((i) => i.id === item.id && i.color === item.color);
-  if (existingItem != undefined) {
-    existingItem.qty = newQty;
+//Récupérer les articles du local storage
+function getCart() {
+  let cart = localStorage.getItem("cart");
+  if (cart == null) {
+    return [];
   } else {
-    item.qty = newQty;
-    cart.push(item);
+    return JSON.parse(cart);
   }
-  saveInLocalStorage(cart);
 }
 
-//Enlever un article
-function removeFromCart(item) {
-  let cart = getCart();
-  cart = cart.filter(i => i.id !== item.id || i.color !== item.color);
-  saveInLocalStorage(cart);
-}
+
+
