@@ -52,6 +52,10 @@ async function displayCart() {
         </div>
       `;
 
+      // ajout des attributs data-id et data-color à l'élément HTML cible
+      itemElement.setAttribute('data-id', item.id);
+      itemElement.setAttribute('data-color', item.color);
+
       // insertion de l'élément HTML dans la page
       document.querySelector('#cart__items').appendChild(itemElement);
     }
@@ -60,38 +64,30 @@ async function displayCart() {
     document.getElementById('totalQuantity').innerHTML = numItems;
     document.getElementById('totalPrice').innerHTML = total;
   }
+  
+    // Gestion du clic sur le bouton "Supprimer"
+    let deleteButtons = document.querySelectorAll('.deleteItem');
+    for (let i = 0; i < deleteButtons.length; i++) {
+      let deleteButton = deleteButtons[i];
+      deleteButton.addEventListener('click', function(event) {
+        // Récupération de l'identifiant du produit à partir de l'attribut "data-id"
+        let productId = event.target.closest('.cart__item').dataset.id;
+  
+        // Mise à jour du panier en retirant l'item correspondant
+        cart = cart.filter(function(item) {
+          return item.id !== productId;
+        });
+        localStorage.setItem('cart', JSON.stringify(cart));
+  
+        // Mise à jour de l'affichage du panier
+      document.querySelector('#cart__items').innerHTML = '';
+      if (cart && cart.length > 0) {
+        displayCart();
+      } else {
+        // Mise à jour de l'élément HTML pour afficher le total
+        document.getElementById('totalQuantity').innerHTML = 0;
+        document.getElementById('totalPrice').innerHTML = 0;
+      }
+    });
+  };
 }
-
-// ajout d'un EventListener de type 'change' sur tous les éléments HTML de classe 'itemQuantity'
-document.querySelectorAll('.itemQuantity').forEach(function(input) {
-  input.addEventListener('change', function() {
-    // récupération de la quantité
-    let qty = input.value;
-
-    // récupération de l'article parent
-    let item = input.parentElement.parentElement.parentElement.parentElement;
-
-    // récupération du prix de l'article
-    let price = item.querySelector('.cart__item__content__description > p:last-child').textContent;
-
-    // mise à jour du prix total de l'article
-    item.querySelector('.cart__item__content__description > p:last-child').textContent = qty * price + " €";
-
-    // récupération des éléments HTML correspondant au nombre d'articles et au prix total
-    let totalQuantityElement = document.getElementById('totalQuantity');
-    let totalPriceElement = document.getElementById('totalPrice');
-
-    // récupération des valeurs actuelles de ces éléments
-    let totalQuantity = parseInt(totalQuantityElement.textContent);
-    let totalPrice = parseInt(totalPriceElement.textContent);
-
-    // mise à jour de ces valeurs
-    totalQuantity += qty - oldQty;
-    totalPrice += qty * price - oldQty * oldPrice;
-
-    // mise à jour des éléments HTML
-    totalQuantityElement.innerHTML = totalQuantity;
-    totalPriceElement.innerHTML = totalPrice + " €";
-  });
-});
-
