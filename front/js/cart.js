@@ -1,93 +1,147 @@
 document.addEventListener('DOMContentLoaded', function() {
-  displayCart();
-});
+  // Récupère l'objet "cart" dans le "localStorage"
+  let cart = localStorage.getItem('cart');
 
-async function displayCart() {
-  // initialisation de la somme totale à 0
-  let total = 0;
-  // initialisation du nombre d'articles à 0
-  let numItems = 0;
+  // Convertit l'objet en tableau
+  let cartArray = JSON.parse(cart);
 
-  // récupération du panier (array) depuis le localStorage
-  let cart = JSON.parse(localStorage.getItem('cart'));
-
-  // vérification que le panier existe et n'est pas vide
-  if (cart && cart.length > 0) {
-    // parcours de l'array du panier
-    for (let i = 0; i < cart.length; i++) {
-      // récupération de l'item courant
-      let item = cart[i];
-
-      // récupération des informations sur le produit à l'aide d'une requête HTTP à l'API
-      const response = await fetch(`http://localhost:3000/api/products/${item.id}`);
-      const product = await response.json();
-
-      // ajout du prix de l'item courant à la somme totale
-      total += product.price * item.qty;
-      // ajout de la quantité de l'item courant au nombre d'articles
-      numItems += item.qty;
-
-      // création d'un élément HTML pour l'item courant
-      let itemElement = document.createElement('article');
-      itemElement.classList.add('cart__item');
-      itemElement.innerHTML = `
-        <div class="cart__item__img">
-          <img src="${product.imageUrl}" alt="${product.name}">
-        </div>
-        <div class="cart__item__content">
-          <div class="cart__item__content__description">
-            <h2>${product.name}</h2>
-            <p>${item.color}</p>
-            <p>${product.price * item.qty} €</p>
-          </div>
-          <div class="cart__item__content__settings">
-            <div class="cart__item__content__settings__quantity">
-              <p>Qté : </p>
-              <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${item.qty}">
-            </div>
-            <div class="cart__item__content__settings__delete">
-              <p class="deleteItem" data-id="${product.id}">Supprimer</p>
-            </div>
-          </div>
-        </div>
-      `;
-
-      // ajout des attributs data-id et data-color à l'élément HTML cible
-      itemElement.setAttribute('data-id', item.id);
-      itemElement.setAttribute('data-color', item.color);
-
-      // insertion de l'élément HTML dans la page
-      document.querySelector('#cart__items').appendChild(itemElement);
-    }
-
-    // mise à jour de l'élément HTML pour afficher le total
-    document.getElementById('totalQuantity').innerHTML = numItems;
-    document.getElementById('totalPrice').innerHTML = total;
+  // Initialise la variable "cartArray" si la valeur de "cart" est null ou vide
+  if (!cart || cart.length === 0) {
+    cartArray = [];
   }
-  
-    // Gestion du clic sur le bouton "Supprimer"
-    let deleteButtons = document.querySelectorAll('.deleteItem');
-    for (let i = 0; i < deleteButtons.length; i++) {
-      let deleteButton = deleteButtons[i];
-      deleteButton.addEventListener('click', function(event) {
-        // Récupération de l'identifiant du produit à partir de l'attribut "data-id"
-        let productId = event.target.closest('.cart__item').dataset.id;
-  
-        // Mise à jour du panier en retirant l'item correspondant
-        cart = cart.filter(function(item) {
-          return item.id !== productId;
+
+  let cartContainer = document.querySelector('#cart__items');
+  let totalQuantity = document.querySelector('#totalQuantity');
+  let totalPrice = document.querySelector('#totalPrice');
+
+  // Tableau pour stocker les éléments uniques
+  let uniqueItems = [];
+  let totalQty = 0;
+  let price = 0;
+
+  // Parcours chaque élément du tableau
+  for (let i = 0; i < cartArray.length; i++) {
+    let item = cartArray[i];
+
+    // Mise à jour du total des quantités affiché sur la page
+    totalQuantity.textContent = totalQty;
+
+    // Récupère les données du produit via une requête HTTP asynchrone (fetch)
+    fetch(`http://localhost:3000/api/products/${item.id}`)
+      .then(response => response.json())
+      .then(data => {
+        // Ajout de la quantité de l'article à la variable "totalQty"
+        totalQty += item.qty;
+        // Ajout du prix de l'article à la variable "price"
+        price += item.qty * data.price;
+
+        // Mise à jour du total des quantités et des prix affiché sur la page
+        totalQuantity.textContent = totalQty;
+        totalPrice.textContent = price;
+
+        // Vérifie si l'élément existe déjà dans le tableau "uniqueItems"
+        let exists = uniqueItems.find(uniqueItem => uniqueItem.id === item.id && uniqueItem.color === item.color);
+
+        if (!exists) {
+          // Si l'élément n'existe pas, on l'ajoute au tableau "uniqueItems"
+          uniqueItems.push(item);
+
+          // On crée un nouvel élément dans le panier
+          let cartItem = document.createElement('article');
+          cartItem.classList.add('cart__item');
+          cartItem.setAttribute('data-id', item.id);
+          cartItem.setAttribute('data-color', item.color);
+
+          // On ajoute le contenu de l'élément au panier
+          cartItem.innerHTML = `
+            <div class="cart__item__img">
+              <img src="${data.imageUrl}" alt="${data.altTxt}">
+            </div>
+            <div class="cart__item__content">
+              <div class="cart__item__content__description">
+                <h2>${data.name}</h2>
+                <p>${item.color}</p>
+                <p class="itemPrice">${item.qty * data.price} €</p>
+              </div>
+              <div class="cart__item__content__settings">
+                <div class="cart__item__content__settings__quantity">
+                  <p>Qté : </p>
+                  <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${item.qty}">
+                </div>
+                <div class="cart__item__content__settings__delete">
+                  <p class="deleteItem">Supprimer</p>
+                </div>
+              </div>
+            </div>
+          `;
+
+          // On ajoute l'élément au panier
+          cartContainer.appendChild(cartItem);
+
+          let itemQuantities = document.querySelectorAll('.itemQuantity');
+
+          for (let i = 0; i < itemQuantities.length; i++) {
+            itemQuantities[i].addEventListener('change', function() {
+              // Récupère l'ID et la couleur de l'article à modifier
+              let cartItem = this.closest('.cart__item');
+              let itemId = cartItem.getAttribute('data-id');
+              let itemColor = cartItem.getAttribute('data-color');
+
+              // Récupère l'objet de l'article à modifier dans le tableau "cartArray"
+              let item = cartArray.find(item => item.id === itemId && item.color === itemColor);
+
+              // Modifie la quantité de l'article
+              item.qty = this.value;
+
+              // Met à jour le "localStorage"
+              localStorage.setItem('cart', JSON.stringify(cartArray));
+
+              // Met à jour le total des quantités et des prix affiché sur la page
+              totalQty = 0;
+              price = 0;
+              for (let i = 0; i < cartArray.length; i++) {
+              let item = cartArray[i];
+              totalQty += item.qty;
+              price += item.qty * data.price;
+            }
+            totalQuantity.textContent = totalQty;
+            totalPrice.textContent = price;
+            });
+          }
+
+
+          // Écouteur d'événement sur le bouton "Supprimer"
+          let deleteButton = cartItem.querySelector('.deleteItem');
+          deleteButton.addEventListener('click', function() {
+          // Récupère l'élément parent (l'article cart__item)
+          let cartItem = this.closest('.cart__item');
+
+          // Récupère l'ID et la couleur de l'article à supprimer
+          let itemId = cartItem.getAttribute('data-id');
+          let itemColor = cartItem.getAttribute('data-color');
+
+          // Supprime l'objet de l'article du tableau "cartArray"
+          cartArray = cartArray.filter(item => !(item.id === itemId && item.color === itemColor));
+
+          // Met à jour le "localStorage"
+          localStorage.setItem('cart', JSON.stringify(cartArray));
+
+          // Supprime l'article du panier
+          cartContainer.removeChild(cartItem);
+
+          // Met à jour le total des quantités et des prix affiché sur la page
+          totalQty = 0;
+          price = 0;
+          for (let i = 0; i < cartArray.length; i++) {
+            let item = cartArray[i];
+            totalQty += item.qty;
+            price += item.qty * data.price;
+          }
+          totalQuantity.textContent = totalQty;
+          totalPrice.textContent = price;
         });
-        localStorage.setItem('cart', JSON.stringify(cart));
-  
-        // Mise à jour de l'affichage du panier
-      document.querySelector('#cart__items').innerHTML = '';
-      if (cart && cart.length > 0) {
-        displayCart();
-      } else {
-        // Mise à jour de l'élément HTML pour afficher le total
-        document.getElementById('totalQuantity').innerHTML = 0;
-        document.getElementById('totalPrice').innerHTML = 0;
       }
     });
-  };
-}
+  }
+});
+          
