@@ -1,5 +1,4 @@
 /* Récupération des données de l'Api */
-
 fetch(`http://localhost:3000/api/products`)
   .then(function(response) {
     if(response.ok) {
@@ -15,7 +14,6 @@ fetch(`http://localhost:3000/api/products`)
   })
 
 /** Création de la classe "Meubles" (Facultatif) **/
-
 class Meubles {
   constructor(couleur, id, nom, prix, imageUrl, description, altTexte){
     this.couleur = couleur;
@@ -29,11 +27,9 @@ class Meubles {
 }
 
 /*** Création d'un tableau vide (Facultatif) ***/
-
 let tableauArticles = [];
 
 /**** Fonction permettant d'ajouter les articles dans le tableau vide à l'aide d'une boucle for... of ****/
-
 function creationObjets(articles) {
 
   for(let article of articles) {
@@ -47,15 +43,22 @@ function creationObjets(articles) {
 }
 
 /***** Fonction d'affichage des éléments dans le HTML *****/
-
 function newElt() {
   
   const items = document.getElementById('items'); //Permet d'accéder à l'élément HTML dont l'id est "items"
 
   const urlIndex = encodeURI(window.location.href); //Encodage de l'url
-  const urlProduct = urlIndex.replace('html', 'html/product.html');
-  const urlWithoutSlash = urlProduct.substring(0, urlProduct.length -1);//Permet d'enlever le slash dans l'url
+  let urlProduct = '';
 
+  // TODO : Vérifier à la mise en ligne si c'est toujours valable
+  if(urlIndex.includes('index.html')) {
+    urlProduct = urlIndex.replace('html/index.html', 'html/product.html/');
+  }
+  else {
+    urlProduct = urlIndex.replace('html', 'html/product.html');
+  }
+ 
+  const urlWithoutSlash = urlProduct.substring(0, urlProduct.length -1);//Permet d'enlever le slash dans l'url
   console.log('urlProduct =' + urlWithoutSlash);
 
   const newUrl = new URL(urlWithoutSlash); //Permet d'utiliser les méthodes (objet url)

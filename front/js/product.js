@@ -62,25 +62,38 @@ function storeData() {
   const targetColor = document.querySelector("#colors");
   const targetQty = document.querySelector("#quantity");
 
-  //Si ce n'est pas un entier ou si sa valeur est inférieure à 1 ou supérieure à 100, 
-  //un message d'erreur s'affiche et stop la fonction
+  // Vérifie si aucune quantité et couleur n'ont été sélectionnées
+  if (targetQty.value === "0" && targetColor.value === "") {
+    alert("Vous devez indiquer une couleur et une quantité.");
+    return;
+  }
+
+  // Vérifie si une quantité a été sélectionnée mais pas de couleur
+  if (targetColor.value === "" && targetQty.value) {
+    alert("Vous devez indiquer une couleur.");
+    return;
+  }
+
+  // Vérifie si une couleur a été sélectionnée mais pas de quantité
+  if (targetColor.value && targetQty.value === "0") {
+    alert("Merci d'indiquer une quantité comprise entre 1 et 100.");
+    return;
+  }
+
+  // Vérifie si la quantité est un entier compris entre 1 et 100
   if (!/^\d+$/.test(targetQty.value) || targetQty.value < 1 || targetQty.value > 100) {
     alert("La quantité doit être un nombre entier compris entre 1 et 100.");
     return;
   }
 
-  // Vérifie que la quantité et la couleur sont sélectionnées et que la valeur de la couleur n'est pas vide avant de créer l'objet "item"
-  if (targetColor && targetQty && targetQty.value > 0 && targetColor.value !== "") {
-    let item = {
-      id: idUrl,
-      color: targetColor.value,
-      qty: targetQty.value
-    }
+  // Crée l'objet "item" si la quantité et la couleur sont valides
+  let item = {
+    id: idUrl,
+    color: targetColor.value,
+    qty: targetQty.value
+  }
 
-    addToCart(item);
-} else {
-  alert("Vous devez indiquer une couleur.");
-}
+  addToCart(item);
 }
 
 //Sauvegarder le panier dans le local storage
@@ -124,6 +137,3 @@ function getCart() {
     return JSON.parse(cart);
   }
 }
-
-
-
