@@ -6,14 +6,14 @@ fetch(`http://localhost:3000/api/products`)
     }
   })
   .then(function(articles) {
-    console.log(articles);
+    // console.log(articles);
     creationObjets(articles);
   })
   .catch(function(error) {
     console.log(error);
   })
 
-/** Création de la classe "Meubles" (Facultatif) **/
+// Création de la classe "Meubles" afin de s'exercer à créer une classe (Facultatif)
 class Meubles {
   constructor(couleur, id, nom, prix, imageUrl, description, altTexte){
     this.couleur = couleur;
@@ -26,50 +26,52 @@ class Meubles {
   }
 }
 
-/*** Création d'un tableau vide (Facultatif) ***/
-let tableauArticles = [];
+/** Création d'un tableau vide **/
+let arrayItems = [];
 
-/**** Fonction permettant d'ajouter les articles dans le tableau vide à l'aide d'une boucle for... of ****/
+/*** Fonction permettant d'ajouter les articles dans le tableau vide à l'aide d'une boucle for... of ***/
 function creationObjets(articles) {
 
   for(let article of articles) {
-    console.log(article);
+    // console.log(article);
 
-    tableauArticles.push(new Meubles(article.colors, article._id, article.name, article.price, article.imageUrl, article.description, article.altTxt));
+    arrayItems.push(new Meubles(article.colors, article._id, article.name, article.price, article.imageUrl, article.description, article.altTxt));
   }
 
-  console.log(tableauArticles);
+  console.log(arrayItems);
   newElt();
 }
 
-/***** Fonction d'affichage des éléments dans le HTML *****/
+/**** Fonction : création des éléments du DOM et affichage des éléments sur la page d'accueil ****/
 function newElt() {
   
   const items = document.getElementById('items'); //Permet d'accéder à l'élément HTML dont l'id est "items"
 
   const urlIndex = encodeURI(window.location.href); //Encodage de l'url
-  let urlProduct = '';
+  let urlProduct = ''; //Déclaration de la variable urlProduct
 
   // TODO : Vérifier à la mise en ligne si c'est toujours valable
+  // Vérifie si l'url contient "index.html" et remplace par "product.html" si c'est le cas
   if(urlIndex.includes('index.html')) {
     urlProduct = urlIndex.replace('html/index.html', 'html/product.html/');
   }
   else {
+    // Vérifie si l'url contient "html" et remplace par "product.html" si c'est le cas
     urlProduct = urlIndex.replace('html', 'html/product.html');
   }
- 
-  const urlWithoutSlash = urlProduct.substring(0, urlProduct.length -1);//Permet d'enlever le slash dans l'url
-  console.log('urlProduct =' + urlWithoutSlash);
-
-  const newUrl = new URL(urlWithoutSlash); //Permet d'utiliser les méthodes (objet url)
-
+  
+  // On supprime le dernier caractère de l'url car celle-ci est incorrecte par défaut (caractère "/" en trop)
+  const urlWithoutSlash = urlProduct.substring(0, urlProduct.length -1);
+  // console.log('urlProduct =' + urlWithoutSlash);
+  // Permet de créer un nouvel objet URL à partir de l'url sans le dernier caractère
+  const newUrl = new URL(urlWithoutSlash); 
   console.log(newUrl);
 
-  for(let article of tableauArticles) {
+  for (let article of arrayItems) {
 
     newUrl.searchParams.set('id', article.id);
 
-  //Analyse et ajoute les éléments comme du HTML tout en évitant la sérialisation (traduire un objet ou autre dans un format approprié)  
+    //Ajoute les éléments dans le DOM avant le premier enfant de l'élément "items"  
     items.insertAdjacentHTML('afterbegin', ` 
     <a href="${newUrl.href}">
     <article>

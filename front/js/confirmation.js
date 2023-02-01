@@ -12,3 +12,6 @@ recupOrderId.innerHTML = `${idProduct}`;
 
 // On vide le localStorage
 localStorage.clear();
+
+    
+  
