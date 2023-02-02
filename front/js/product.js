@@ -64,13 +64,13 @@ function storeData() {
 
   // Vérifie si aucune quantité et couleur n'ont été sélectionnées
   if (targetQty.value === "0" && targetColor.value === "") {
-    alert("Vous devez indiquer une couleur et une quantité.");
+    alert("Merci d'indiquer une couleur et une quantité.");
     return;
   }
 
   // Vérifie si une quantité a été sélectionnée mais pas de couleur
   if (targetColor.value === "" && targetQty.value) {
-    alert("Vous devez indiquer une couleur.");
+    alert("Merci d'indiquer une couleur.");
     return;
   }
 
@@ -82,7 +82,7 @@ function storeData() {
 
   // Vérifie si la quantité est un entier compris entre 1 et 100
   if (!/^\d+$/.test(targetQty.value) || targetQty.value < 1 || targetQty.value > 100) {
-    alert("La quantité doit être un nombre entier compris entre 1 et 100.");
+    alert("Merci d'indiquer une quantité comprise entre 1 et 100.");
     return;
   }
 
@@ -93,10 +93,12 @@ function storeData() {
     qty: targetQty.value
   }
 
+  alert ("Votre article est dans le panier, allons vérifier.");
+
   addToCart(item);
 }
 
-//Sauvegarder le panier dans le local storage
+// Sauvegarder le panier dans le local storage
 function saveInLocalStorage(cart) { 
   localStorage.setItem("cart", JSON.stringify(cart));
   window.location.href = "cart.html"
@@ -120,7 +122,7 @@ function addToCart(item) {
     }
   }
 
-  //Ajoute l'article au panier s'il n'existe pas déjà
+  // Ajoute l'article au panier s'il n'existe pas déjà
   if (!itemExists) {
     cart.push(item);
   }
@@ -128,7 +130,7 @@ function addToCart(item) {
   saveInLocalStorage(cart);
 }
 
-//Récupérer les articles du local storage
+// Récupérer les articles du local storage
 function getCart() {
   let cart = localStorage.getItem("cart");
   if (cart == null) {

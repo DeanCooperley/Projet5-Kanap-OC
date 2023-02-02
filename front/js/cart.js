@@ -29,7 +29,7 @@ async function cartView() {
     // On vérifie que le panier existe et qu'il contient des produits
     if (cart === null || cart.length === 0) {
         // Si le panier est vide, on affiche ce message dans le DOM
-        document.querySelector('h1').textContent = 'Votre panier est vide';
+        document.querySelector('h1').textContent = 'Votre panier est vide.';
         // Sinon on récupère les données du LS
     } else for (let i = 0; i < cart.length; i++) {
         let item = cart[i];
@@ -80,29 +80,29 @@ cartView();
 /**** Fonction de mise à jour du LS ****/
 
 function dataLogging() {
-  localStorage.setItem('cart', JSON.stringify(cart))
+    localStorage.setItem('cart', JSON.stringify(cart))
 }
 
 /***** Fonction de calcul du prix total et de la quantité totale *****/
 
 async function qtyPriceTotal() {
-  let totalPrice = 0;
-  let totalQty = 0;
+    let totalPrice = 0;
+    let totalQty = 0;
+    // On vérifie que le panier existe et qu'il contient des produits
+    if (cart && cart.length) {
+        for (let j = 0; j < cart.length; j++) {
+            let dataLocalStorage = cart[j]; // On récupère les infos du LS
+            const product = await recupData(dataLocalStorage.id); // On récupère les infos de l'API
+            totalPrice += parseInt(dataLocalStorage.qty) * parseInt(product.price); // On calcule le prix total
+            totalQty += parseInt(dataLocalStorage.qty); // On calcule la quantité totale
+        }
+    } 
+    // On affiche la quantité et le prix total dans le DOM
+    const addQty = document.getElementById('totalQuantity');
+    addQty.innerHTML = totalQty;
 
-  if (cart && cart.length) {
-    for (let j = 0; j < cart.length; j++) {
-      let dataLocalStorage = cart[j]; // On récupère les infos du LS
-      const product = await recupData(dataLocalStorage.id); // On récupère les infos de l'API
-      totalPrice += parseInt(dataLocalStorage.qty) * parseInt(product.price); // On calcule le prix total
-      totalQty += parseInt(dataLocalStorage.qty); // On calcule la quantité totale
-    }
-  } 
-  // On affiche la quantité et le prix total dans le DOM
-  const addQty = document.getElementById('totalQuantity');
-  addQty.innerHTML = totalQty;
-
-  const addPrice = document.getElementById('totalPrice');
-  addPrice.innerHTML = totalPrice;
+    const addPrice = document.getElementById('totalPrice');
+    addPrice.innerHTML = totalPrice;
 }
 qtyPriceTotal();
 
@@ -143,17 +143,22 @@ function addItems() {
 
 /******* Fonction de suppression des produits *******/
 
+// On crée un tableau vide pour stocker les produits à supprimer
 function deleteProducts() {
     let deleteBtn = Array.from(document.querySelectorAll('.deleteItem'));
     
     let deleteTable = [];
-
+    // On boucle sur le bouton de suppression
     deleteBtn.forEach((deleteBtn, index) => {
         deleteBtn.addEventListener("click", () => {
+            // Supprime visuellement l'élément parent de deleteBtn
             deleteBtn.parentElement.style.display = "none";
+            // On supprime le produit du tableau
             deleteTable = cart;
+            // On supprime le produit du LS
             deleteTable.splice(index, 1);
             cart = localStorage.setItem("cart", JSON.stringify(deleteTable));
+            // On recharge la page
             window.location.href = "cart.html";
         });
     });
@@ -167,7 +172,7 @@ const inputFields = [
     {id: "lastName", regex: /^[_a-zA-ZÀ-ÿ\s-]{2,80}$/, errorId: "lastNameErrorMsg"},
     {id: "address", regex: /^[0-9a-zA-ZÀ-ÿ\s,-]{2,150}$/, errorId: "addressErrorMsg"},
     {id: "city", regex: /^[_a-zA-ZÀ-ÿ\s-]{2,80}$/, errorId: "cityErrorMsg"},
-    {id: "email", regex: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,4}$/, errorId: "emailErrorMsg"}
+    {id: "email", regex: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+.[a-zA-Z]{2,4}$/, errorId: "emailErrorMsg"}
 ];
 
 // Fonction de validation du formulaire
@@ -176,6 +181,7 @@ function validationForm() {
     for (const field of inputFields) {
         // Récupération des éléments du DOM
         const input = document.getElementById(field.id);
+        // On récupère l'élément qui contient le message d'erreur
         const error = document.querySelector(`#${field.errorId}`);
         // Si le champ n'est pas valide, on affiche un message d'erreur
         if (!field.regex.test(input.value) || input.value === null) {
@@ -198,22 +204,37 @@ const inputAddress = document.querySelector("#address");
 const inputCity = document.querySelector("#city");
 const inputEmail = document.querySelector("#email");
 
-// Fonction au clic sur le bouton commander
 orderBtn.addEventListener("click", function(e) {
     e.preventDefault();
+    // Si le formulaire est valide, on envoie les données au serveur
     if (validationForm()) {
-        // Récupération des produits dans le localStorage
-        let dataInLocalStorage = JSON.parse(localStorage.getItem("products"));
-
-        // Création d'un tableau avec seulement les id des produits
-        let idProducts = [];
-        for (let productId in dataInLocalStorage) { // On utilise une boucle for in pour parcourir un objet
-            idProducts.push(productId.id);
+        let dataInLocalStorage = JSON.parse(localStorage.getItem("cart"));
+        // console.log(dataInLocalStorage);
+        // Si le panier est vide, on affiche un message d'erreur
+        if (dataInLocalStorage === null || Object.keys(dataInLocalStorage).length === 0) {
+            alert("Le panier est vide.")
+            return;
         }
-        
-        // Création de l'objet "order" pour l'envoi au serveur
+        // Vérification de la quantité de chaque produit
+        let invalidQty = false;
+        for (let productId in dataInLocalStorage) {
+            if (dataInLocalStorage[productId].qty > 0) {
+                invalidQty = true;
+                break;
+            }
+        }
+        // Si la quantité est inférieure ou égale à zéro, on affiche un message d'erreur
+        if (invalidQty) {
+            alert("La quantité ne peut pas être égale à zéro.");
+            return;
+        }
+        // On crée un tableau avec les id des produits
+        let idProducts = [];
+        for (let productId in dataInLocalStorage) {
+            idProducts.push(dataInLocalStorage[productId].id);
+        }
+        // On crée un objet avec les données du formulaire
         const order = {
-            // On récupère les données du formulaire
             contact: {
                 firstName: inputFirstName.value,
                 lastName: inputLastName.value,
@@ -221,34 +242,25 @@ orderBtn.addEventListener("click", function(e) {
                 city: inputCity.value,
                 email: inputEmail.value
             },
-            // On récupère les id des produits
             products: idProducts
         };
-
-        // On crée un objet pour l'envoi des données
+        // On envoie les données au serveur
         const dataFetch = {
-            // On indique la méthode POST pour envoyer les données
             method: "POST",
             headers: {
-                "Content-type": "application/json", // Indique le type de données envoyées
+                "Content-type": "application/json",
             },
-            body: JSON.stringify(order) // Conversion de l'objet en chaîne de caractères
+            body: JSON.stringify(order)
         };
-        
-        // Envoi de la commande via fetch et récupération de l'orderId
+        // On récupère l'id de la commande et on redirige vers la page de confirmation
         fetch("http://localhost:3000/api/products/order", dataFetch)
         .then((response) => response.json())
             .then((data) => {
-                // console.log(data);
-                // On envoie l'orderId dans l'URL pour établir un numéro de commande
                 document.location.href = `confirmation.html?orderId=${data.orderId}`;
         })
-        // Si erreur, on affiche un message dans la console
         .catch((err) => {
             console.log("Erreur d'envoi des données", err);
         });
     }
-    validationForm(); // On appelle la fonction de validation du formulaire
+    validationForm();
 });
-
-  
