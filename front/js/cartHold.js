@@ -18,10 +18,10 @@ function recupData(idUrl) {
     .catch(error => {
         error = `Une erreur s'est produite.`;
         alert(error);
-    });
+    })
     // console.log(response)
     return response;
-};
+}
 
 // 3. Fonction d'affichage des produits dans le panier
 
@@ -73,15 +73,15 @@ async function cartView() {
         addItems();
         // Fonction de suppression des produits
         deleteProducts();
-    };
-};
+    }
+}
 cartView(); 
 
 // 4. Fonction de mise à jour du LS 
 
 function dataLogging() {
     localStorage.setItem('cart', JSON.stringify(cart))
-};
+}
 
 // 5. Fonction de calcul du prix total et de la quantité totale
 
@@ -103,7 +103,7 @@ async function qtyPriceTotal() {
 
     const addPrice = document.getElementById('totalPrice');
     addPrice.innerHTML = totalPrice;
-};
+}
 qtyPriceTotal();
 
 // 6. Fonction d'ajout de produits
@@ -118,64 +118,51 @@ function addItems() {
             // On récupère la nouvelle quantité
             let newItemQty = itemQty[i].value;
             let newTotalQty = document.getElementById('totalQuantity');
-            // On récupère les données de l'objet en utilisant Element.closest()
-            let itemElement = itemQty[i].closest('.cart__item');
-            let itemId = itemElement.dataset.id;
-            let itemColor = itemElement.dataset.color;
-            // On trouve l'index de l'objet dans le tableau en utilisant les données de l'objet
-            let index = cart.findIndex(function(obj) {
-                return obj.id === itemId && obj.color === itemColor;
-            });
             // On crée un nouvel objet avec les nouvelles données
             const newObject = {
-                id: cart[index].id,
-                img: cart[index].img,
-                name: cart[index].name,
-                color: cart[index].color,
+                id: cart[i].id,
+                img: cart[i].img,
+                name: cart[i].name,
+                color: cart[i].color,
                 qty: parseInt(newItemQty),
             };
-            if (newItemQty < 1 || newItemQty > 100) {
-                alert('Vous devez choisir une quantité comprise entre 1 et 100');
-                return;
-            };
-            // On remplace l'ancien objet par le nouveau
-            cart[index] = newObject;
-            // On met à jour le LS
-            dataLogging();
-            // On met à jour le prix total et la quantité totale
-            newTotalQty.innerHTML = qtyPriceTotal();
+
+        if (newItemQty < 1 || newItemQty > 100) {
+            alert('Vous devez choisir une quantité comprise entre 1 et 100');
+            return;
+        }
+        // On remplace l'ancien objet par le nouveau
+        cart[i] = newObject;
+        // On met à jour le LS
+        dataLogging();
+        // On met à jour le prix total et la quantité totale
+        newTotalQty.innerHTML = qtyPriceTotal();
         });
-    };
-};
+    }
+}
 
-// 7. Fonction de suppression des produits
+// 7. Fonction de suppression des produits 
 
+// On crée un tableau vide pour stocker les produits à supprimer
 function deleteProducts() {
     let deleteBtn = Array.from(document.querySelectorAll('.deleteItem'));
     
     let deleteTable = [];
     // On boucle sur le bouton de suppression
-    deleteBtn.forEach((deleteBtn) => {
-        deleteBtn.addEventListener("click", (event) => {
+    deleteBtn.forEach((deleteBtn, index) => {
+        deleteBtn.addEventListener("click", () => {
             // Supprime visuellement l'élément parent de deleteBtn
-            deleteBtn.closest('.cart__item').style.display = "none";
-
-            // On récupère les informations de data-id et data-color
-            let itemId = deleteBtn.closest('.cart__item').dataset.id;
-            let itemColor = deleteBtn.closest('.cart__item').dataset.color;
-
-            // On trouve l'index du produit à supprimer dans le tableau
-            let index = cart.findIndex((item) => item.id === itemId && item.color === itemColor);
-
+            deleteBtn.parentElement.style.display = "none";
             // On supprime le produit du tableau
             deleteTable = cart;
+            // On supprime le produit du LS
             deleteTable.splice(index, 1);
             cart = dataLogging();
             // On recharge la page
             window.location.href = "cart.html";
         });
     });
-};
+}
 
 /******** Formulaire ********/
 

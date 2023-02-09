@@ -1,10 +1,12 @@
-/* Récupération de l'id du produit à l'aide de l'url */
+// 1. Récupération de l'id du produit à l'aide de l'url 
+
 const recupUrl = window.location.href;
 const url = new URL(recupUrl);
 const idUrl = url.searchParams.get("id");
 console.log(idUrl);
 
-/** Récupération du produit via son id avec fetch **/
+// 2. Récupération de certaines données du produit via son id avec fetch 
+
 fetch("http://localhost:3000/api/products/" + idUrl)
   .then(function (response) {
     if (response.ok) {
@@ -23,7 +25,8 @@ fetch("http://localhost:3000/api/products/" + idUrl)
     console.log(error);
   })
 
-/*** Fonction d'affichage des informations du produit ***/
+// 3. Fonction d'affichage des données du produit 
+
 function display(articleUnique) {
 
   //Création de l'élément img et intégration de l'image du canapé
@@ -54,7 +57,8 @@ function display(articleUnique) {
   }
 }
 
-//**** Sélection du bouton d'ajout au panier, création du local storage, du panier et enregistrement des articles ****/
+// 4. Fonction des conditions de choix et d'ajout au panier
+
 const btnCart = document.querySelector("#addToCart");
 btnCart.addEventListener("click", storeData);
 
@@ -98,13 +102,15 @@ function storeData() {
   addToCart(item);
 }
 
-// Sauvegarder le panier dans le local storage
+// 5. Sauvegarder le panier dans le local storage 
+
 function saveInLocalStorage(cart) { 
   localStorage.setItem("cart", JSON.stringify(cart));
   window.location.href = "cart.html"
 }
 
-// Ajoute un article au panier
+// 6. Ajouter un article au panier 
+
 function addToCart(item) {
   let cart = getCart();
   let itemExists = false;
@@ -130,7 +136,8 @@ function addToCart(item) {
   saveInLocalStorage(cart);
 }
 
-// Récupérer les articles du local storage
+// 7. Récupérer les articles du local storage 
+
 function getCart() {
   let cart = localStorage.getItem("cart");
   if (cart == null) {

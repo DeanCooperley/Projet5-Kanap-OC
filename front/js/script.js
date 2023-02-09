@@ -1,4 +1,5 @@
 /* Récupération des données de l'Api */
+
 fetch(`http://localhost:3000/api/products`)
   .then(function(response) {
     if(response.ok) {
@@ -26,7 +27,8 @@ class Meubles {
   }
 }
 
-/** Création d'un tableau vide **/
+/** Création d'un tableau vide pour y stocker les données récupérées **/
+
 let arrayItems = [];
 
 /*** Fonction permettant d'ajouter les articles dans le tableau vide à l'aide d'une boucle for... of ***/
@@ -43,6 +45,7 @@ function creationObjets(articles) {
 }
 
 /**** Fonction : création des éléments du DOM et affichage des éléments sur la page d'accueil ****/
+
 function newElt() {
   
   const items = document.getElementById('items'); //Permet d'accéder à l'élément HTML dont l'id est "items"
@@ -68,7 +71,7 @@ function newElt() {
   console.log(newUrl);
 
   for (let article of arrayItems) {
-
+    // Permet d'ajouter un paramètre à l'url
     newUrl.searchParams.set('id', article.id);
 
     //Ajoute les éléments dans le DOM avant le premier enfant de l'élément "items"  
@@ -81,7 +84,6 @@ function newElt() {
     </article>
     </a>
     `);
-
   }
 }
 
